@@ -4,6 +4,7 @@ import Joo.community.dto.sign.LoginRequestDto;
 import Joo.community.dto.sign.SignUpRequestDto;
 import Joo.community.dto.sign.TokenRequestDto;
 import Joo.community.response.Response;
+import Joo.community.service.auth.AuthService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class AuthController {
     @PostMapping("/sign-in")
     @ResponseStatus(HttpStatus.OK)
     public Response signIn(@Valid @RequestBody final LoginRequestDto req) {
-        return success(authService.signin(req));
+        return success(authService.signIn(req));
     }
 
     @ApiOperation(value = "토큰 재발급", notes = "토큰 재발급 요청")
