@@ -42,15 +42,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         // CSRF 설정 Disable
         http.csrf().disable();
+
+        // CORS
+        http.cors().configurationSource(request -> {
+            var cors = new CorsConfiguration();
+            cors.setAllowedOrigins(List.of("https://http://localhost:8080/sign-in" +
+                    ""));
+            cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+            cors.setAllowedHeaders(List.of("*"));
+            return cors;
+        });
     }
-//        // CORS
-//        http.cors().configurationSource(request -> {
-//            var cors = new CorsConfiguration();
-//            cors.setAllowedOrigins(List.of("https://633ec6989ec820004a30086c--cheery-kheer-fe145b.netlify.app/"));
-//            cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-//            cors.setAllowedHeaders(List.of("*"));
-//            return cors;
-//        });
+}
 //
 //        http
 //                .authorizeRequests()
@@ -140,7 +143,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .and()
 //                .apply(new JwtSecurityConfig(tokenProvider));
 //    }
-}
+//}
 
 
 
