@@ -91,27 +91,18 @@ public class AuthService {
 
     @Transactional
     public TokenResponseDto reissue(final TokenRequestDto tokenRequestDto) {
-
         validateRefreshToken(tokenRequestDto);
 
-        // 2. Access Token 에서 Member ID 가져오기
         Authentication authentication = tokenProvider.getAuthentication(tokenRequestDto.getAccessToken());
-        
-        // 3. 저장소에서 Member ID 를 기반으로 Refresh Token 값 가져옴
         RefreshToken refreshToken = refreshTokenRepository.findByKey(authentication.getName())
                 .orElseThrow(() -> new RuntimeException("로그아웃 된 사용자입니다."));
 
-        // 4. Refresh Token 일치여부 검증
         validateRefreshTokenOwner(refreshToken, tokenRequestDto);
 
-        // 5. 새로운 토큰 생성
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
-        
-        // 6. 저장소 정보 업데이트
         RefreshToken newRefreshToken = refreshToken.updateValue(tokenDto.getRefreshToken());
         refreshTokenRepository.save(newRefreshToken);
-        
-        // 토큰 발급
+
         return new TokenResponseDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
     }
 

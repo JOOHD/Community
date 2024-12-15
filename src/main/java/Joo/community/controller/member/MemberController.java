@@ -2,6 +2,7 @@ package Joo.community.controller.member;
 
 import Joo.community.domain.member.Member;
 import Joo.community.dto.member.MemberEditRequestDto;
+import Joo.community.dto.sign.TokenRequestDto;
 import Joo.community.response.Response;
 import Joo.community.service.member.MemberService;
 import io.swagger.annotations.Api;
@@ -43,8 +44,8 @@ public class MemberController {
     @ApiOperation(value = "회원 정보 수정", notes = "회원의 정보를 수정")
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/users")
-    public Response editMemberInfo(@RequestBody final MemberEditRequestDto memberEditRequestDto, @JwtAuth final Member member) {
-        return Response.success(memberService.editMemberInfo(member, memberEditRequestDto));
+    public Response editMemberInfo(@RequestBody final MemberEditRequestDto memberEditRequestDto, Member member, TokenRequestDto tokenRequestDto) {
+        return Response.success(memberService.editMemberInfo(member, memberEditRequestDto, tokenRequestDto));
     }
 
     @ApiOperation(value = "회원 탈퇴", notes = "회원을 탈퇴 시킴")
@@ -55,12 +56,12 @@ public class MemberController {
         return Response.success();
     }
 
-    @ApiOperation(value = "즐겨찾기 한 글 조회", notes = "유저가 즐겨찾기 한 게시글들 조회")
-    @ResponseStatus(HttpStatus.OK)
-    @GetMapping("/users/favorites")
-    public Response findFavorites(Member member) {
-        return Response.success(memberService.findFavorites(member));
-    }
+//    @ApiOperation(value = "즐겨찾기 한 글 조회", notes = "유저가 즐겨찾기 한 게시글들 조회")
+//    @ResponseStatus(HttpStatus.OK)
+//    @GetMapping("/users/favorites")
+//    public Response findFavorites(Member member) {
+//        return Response.success(memberService.findFavorites(member));
+//    }
 }
 
 
