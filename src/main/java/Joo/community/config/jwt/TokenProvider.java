@@ -27,6 +27,11 @@ import java.util.stream.Collectors;
 @PropertySource("classpath:secure.properties")
 public class TokenProvider {
 
+    // generateTokenDto : Access/Refresh token 생성.
+    // validateToken : JWT 유효성 검증.
+    // getAuthentication : 토큰에서 사용자 정보 추출.
+    // getExpiration(String token): 토큰 만료 시간 추출.
+
     private static final String AUTHORITIES_KEY = "auth";
     private static final String BEARER_TYPE = "bearer";
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24; // 1시간 * 24 = 24시간(-Dev)

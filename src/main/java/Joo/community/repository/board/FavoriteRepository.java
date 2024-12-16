@@ -1,9 +1,9 @@
 package Joo.community.repository.board;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import yoon.community.domain.board.Board;
-import yoon.community.domain.board.Favorite;
-import yoon.community.domain.member.Member;
+import Joo.community.domain.board.Board;
+import Joo.community.domain.board.Favorite;
+import Joo.community.domain.member.Member;
 
 import java.util.List;
 import java.util.Optional;

@@ -51,8 +51,8 @@ public class MemberController {
     @ApiOperation(value = "회원 탈퇴", notes = "회원을 탈퇴 시킴")
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/users")
-    public Response deleteMemberInfo(Member member) {
-        memberService.deleteMemberInfo(member);
+    public Response deleteMemberInfo(Member member, TokenRequestDto tokenRequestDto) {
+        memberService.deleteMemberInfo(member, tokenRequestDto);
         return Response.success();
     }
 

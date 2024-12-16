@@ -1,18 +1,21 @@
 package Joo.community.service.member;
 
 import Joo.community.config.jwt.TokenProvider;
+import Joo.community.domain.member.Authority;
 import Joo.community.domain.member.Member;
 import Joo.community.domain.member.RefreshToken;
 import Joo.community.dto.member.MemberEditRequestDto;
 import Joo.community.dto.member.MemberSimpleResponseDto;
 import Joo.community.dto.sign.TokenDto;
 import Joo.community.dto.sign.TokenRequestDto;
+import Joo.community.exception.MemberNotEqualsException;
 import Joo.community.exception.MemberNotFoundException;
 import Joo.community.exception.TokenExpiredException;
 import Joo.community.repository.board.FavoriteRepository;
 import Joo.community.repository.member.MemberRepository;
 import Joo.community.repository.refreshToken.RefreshTokenRepository;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,6 +61,26 @@ public class MemberService {
         return MemberSimpleResponseDto.toDto(member);
     }
 
+    /*
+    @Transactional
+    public UserDto editUserInfo(int id, UserDto updateInfo) {
+        User user = userRepository.findById(id).orElseThrow(() -> {
+            return new MemberNotFoundException();
+        });
+
+        // 권한 처리
+        final Authentication authentication = SecurityContextHolder.getContext.getAuthentication();
+
+        if (!authentication.getName().equals(user.getUsername())) {
+            throw new MemberNotFoundException();
+        } else {
+            user.setNickName(updateInfo.getNickname());
+            user.setName(updateInfo.getName());
+            return UserDto.toDto(user);
+        }
+    }
+    */
+
     @Transactional
     public Member editMemberInfo(final Member member,
                                  final MemberEditRequestDto memberEditRequestDto,
@@ -86,6 +109,27 @@ public class MemberService {
         // 회원 정보 수정 후 Member 반환
         return member;
     }
+
+    /*
+    @Transactional
+    public void deleteUserInfo(int id) {
+
+        // user 유저 정보 유/무 확인.
+        User user = userRepository.findById(id).orElseThrow(MemberNotFoundException::new);
+
+        // user session 을 가져오는 코드.
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        String auth = String.valueOf(authentication.getAuthorities());
+        String authByAdmin = "[" + Authority.ROLE_ADMIN + "]";
+
+        if (authentication.getName().equals(user.getUsername()) || auth.equals(authByAdmin)) {
+            userRepository.deleteById(id);
+        } else {
+            throw new MemberNotEqualsException();
+        }
+    }
+    */
 
     @Transactional
     public void deleteMemberInfo(final Member member, TokenRequestDto tokenRequestDto) {

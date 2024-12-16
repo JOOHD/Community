@@ -15,12 +15,15 @@ import javax.persistence.Table;
 @Entity
 public class RefreshToken {
 
+    // RefreshToken.key = Member.username
+    // RefreshToken.value = 사용자에게 발급된 RefreshToken 문자열
+
     @Id
     @Column(name = "rt_key")
-    private String key;
+    private String key; // username
 
     @Column(name = "rt_value")
-    private String value;
+    private String value; // String RefreshToken
 
     @Builder
     public RefreshToken(String key, String value) {
