@@ -9,7 +9,6 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -91,7 +90,8 @@ public class Board {
     }
 
     private void deleteImages(final List<Image> deletedImages) {
-        deletedImages.forEach(deletedImage -> this.images.remove(deletedImage));
+        deletedImages.forEach(deletedImage ->
+            this.images.remove(deletedImage));
     }
 
     private ImageUpdatedResult findImageUpdatedResult(final List<MultipartFile> addedImageFiles,
