@@ -1,5 +1,12 @@
 server:
+#  servlet:
+#    context-path: /api
   port: 8080
+
+#logging:
+#  level:
+#    org.springframework.web: DEBUG
+#    org.springframework: DEBUG
 
 spring:
   profiles:

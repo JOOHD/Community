@@ -50,8 +50,14 @@ public class AuthService {
     public void signup(RegisterDto req) {
         validateSignUpInfo(req);
 
+        // Builder로 리팩토링
         User user = new User();
         user.setUsername(req.getUsername());
+        user.setPassword(passwordEncoder.encode(req.getPassword()));
+        user.setNickname(req.getNickname());
+        user.setName(req.getName());
+        user.setAuthority(Authority.ROLE_USER);
+        userRepository.save(user);
     }
 
     /*
