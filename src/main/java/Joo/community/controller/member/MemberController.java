@@ -18,7 +18,10 @@ public class MemberController {
 
     /**
      *  1. @ResponseStatus 로 상태코드를 먼저 내려주는 이유
-        ㄴ 컨트롤러 실행 시, 지정해준 상태코드 리턴 -> 실패 시, 에러코드 리턴 -> Service 에서 처리.
+        ㄴ 컨트롤러 실행 시, 지정해준 상태코드 리턴 ->
+        ㄴ 실패 시, 에러코드 리턴 -> Service 에서 처리.
+
+        2. 만약에 Service 에서 문제가 생겼다면, Service 내부에서 Exception 이 터지고
      */
 
     private final MemberService memberService;

@@ -26,11 +26,15 @@ public class AuthController {
     private final AuthService authService;
 
     @ApiOperation(value = "회원가입", notes = "회원가입 진행")
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/signup")
     public Response register(@Valid @RequestBody RegisterDto registerDto) {
         authService.signup(registerDto);
-        return success();
+
+        // 디버깅용 로그
+        Response response = Response.success();
+        System.out.println("Response: " + response);
+
+        return response;
     }
 
     @ApiOperation(value = "로그인", notes = "로그인을 한다.")
