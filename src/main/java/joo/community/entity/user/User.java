@@ -12,6 +12,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,6 +36,8 @@ public class User {
 
     @Builder
     public User(String username, String password, Authority authority) {
+        this.username = username;
+        this.password = password;
         this.authority = authority;
     }
 }

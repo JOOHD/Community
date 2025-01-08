@@ -11,9 +11,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -38,38 +40,44 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder(); // BCryptPasswordEncoder를 사용하여 비밀번호를 인코딩
     }
 
-    protected void configure(HttpSecurity http, WebSecurity web) throws Exception {
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+                .antMatchers("/swagger-ui/**", "/v3/**", "/swagger-resources/**");
+    }
 
-        web.ignoring()
-                .antMatchers("/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/swagger/**");
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         // CSRF 설정 Disable
         http.csrf().disable()
+                .formLogin().disable() // 기본 폼 로그인 비활성화
+                .httpBasic().disable() // 기본 HTTP 인증 비활성화
 
                 // exception handling 할 때 우리가 만든 클래스를 추가
                 .exceptionHandling()
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
 
-                // 시큐리티는 기본적으로 세션을 사용
-                // 여기서는 세션을 사용하지 않기 때문에 세션 설정을 Stateless 로 설정
+                // 세션을 사용하지 않기 위해 Stateless로 설정
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
                 .and()
                 .authorizeRequests()
-                .antMatchers("/swagger-ur/**", "/v3/**").permitAll()
-                .antMatchers("/api/sign-up", "/api/sign-in", "/api/reissue").permitAll()
-                .antMatchers("/test").permitAll()
-                .anyRequest().permitAll() // 모든 요청 허용
+                // Swagger 및 API 호출을 위한 경로는 인증 없이 접근 가능
+                .antMatchers("/", "/login", "/swagger-ur/**", "/v3/**").permitAll()
+                .antMatchers("/api/sign-up", "/api/sign-in", "/api/reissue").permitAll() // 회원가입, 로그인, 재발급은 허용
+                .antMatchers("/test").permitAll() // 테스트 URL 허용
 
+                // API 경로별 권한 설정
                 .antMatchers(HttpMethod.GET, API_USERS).access(ROLE_USER_OR_ADMIN)
                 .antMatchers(HttpMethod.GET, API_USERS_WITH_ID).access(ROLE_USER_OR_ADMIN)
                 .antMatchers(HttpMethod.PUT, API_USERS_WITH_ID).access(ROLE_USER_OR_ADMIN)
                 .antMatchers(HttpMethod.DELETE, API_USERS_WITH_ID).access(ROLE_USER_OR_ADMIN)
 
-                .antMatchers(HttpMethod.POST, API_MESSAGES).authenticated()
+                .antMatchers(HttpMethod.POST, API_MESSAGES).authenticated() // 메시지 전송은 인증 필요
                 .antMatchers(HttpMethod.GET, API_MESSAGES_SENDER).access(ROLE_USER_OR_ADMIN)
                 .antMatchers(HttpMethod.GET, API_MESSAGES_SENDER_WITH_ID).access(ROLE_USER_OR_ADMIN)
                 .antMatchers(HttpMethod.GET, API_MESSAGES_RECEIVER).access(ROLE_USER_OR_ADMIN)
@@ -77,13 +85,13 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.DELETE, API_MESSAGES_SENDER_WITH_ID).access(ROLE_USER_OR_ADMIN)
                 .antMatchers(HttpMethod.DELETE, API_MESSAGES_RECEIVER_WITH_ID).access(ROLE_USER_OR_ADMIN)
 
+                // 나머지 요청은 ROLE_ADMIN만 접근 가능
                 .anyRequest().hasAnyRole("ROLE_ADMIN")
-//                .anyRequest().authenticated() // 나머지는 전부 인증 필요
-//                .anyRequest().permitAll()   // 나머지는 모두 그냥 접근 가능
 
-                // JwtFilter 를 addFilterBefore 로 등록했던 JwtSecurityConfig 클래스를 적용
+                // JWT 필터 추가
                 .and()
                 .apply(new JwtSecurityConfig(tokenProvider));
+        
+        return http.build(); // SecurityFilterChain 반환
     }
 }
-

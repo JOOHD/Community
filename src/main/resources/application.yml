@@ -2,34 +2,22 @@ server:
   port: 8080
 
 spring:
-  main:
-    debug: true
-  profiles:
-    active: local
+  mvc:
+    path-match:
+      matching-strategy: ant_path_matcher
 
+  datasource:
+    url: jdbc:mysql://localhost:3306/community?serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     hibernate:
       ddl-auto: update
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-      use-new-id-generator-mappings: false
     database: mysql
-    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-        #use_sql_comments: true
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher # about swagger
-
-  servlet.multipart.max-file-size: 5MB
-  servlet.multipart.max-request-size: 5MB
+    database-platform: org.hibernate.dialect.MySQLDialect
+    show_sql: true
 
 
-# HS512 알고리즘을 사용할 것이기 때문에 512bit, 즉 64byte 이상의 secret key를 사용해야 한다.
-# Secret 값은 특정 문자열을 Base64 로 인코딩한 값 사용 (아래 명령어를 터미널에 쳐보면 그대로 나옴)
-# $ echo 'spring-boot-security-jwt-tutorial-jiwoon-spring-boot-security-jwt-tutorial' | base64
 

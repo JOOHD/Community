@@ -38,12 +38,12 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserDto findUser(int id) {
+    public UserDto findUser(Long id) {
         return UserDto.toDto(userRepository.findById(id).orElseThrow(MemberNotFoundException::new));
     }
 
     @Transactional
-    public UserDto editUserInfo(int id, UserDto updateInfo) {
+    public UserDto editUserInfo(Long id, UserDto updateInfo) {
         User user = userRepository.findById(id).orElseThrow(MemberNotFoundException::new);
 
 
@@ -60,7 +60,7 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUserInfo(int id) { // user 탈퇴
+    public void deleteUserInfo(Long id) { // user 탈퇴
         User user = userRepository.findById(id).orElseThrow(MemberNotFoundException::new);
 
         final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

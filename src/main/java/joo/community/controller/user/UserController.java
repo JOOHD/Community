@@ -36,21 +36,21 @@ public class UserController {
     @ApiOperation(value = "개별 회원 조회", notes = "개별 회원을 조회")
     @ResponseStatus(HttpStatus.OK)
     @GetMapping("/users/{id}")
-    public Response findUser(@ApiParam(value = "User ID", required = true) @PathVariable int id) {
+    public Response findUser(@ApiParam(value = "User ID", required = true) @PathVariable Long id) {
         return Response.success(userService.findUser(id));
     }
 
     @ApiOperation(value = "회원 정보 수정", notes = "회원의 정보를 수정")
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/users/{id}")
-    public Response editUserInfo(@ApiParam(value = "User ID", required = true) @PathVariable int id, @RequestBody UserDto userDto) {
+    public Response editUserInfo(@ApiParam(value = "User ID", required = true) @PathVariable Long id, @RequestBody UserDto userDto) {
         return Response.success(userService.editUserInfo(id, userDto));
     }
 
     @ApiOperation(value = "회원 탈퇴", notes = "회원을 탈퇴 시킴")
     @ResponseStatus(HttpStatus.OK)
     @DeleteMapping("/users/{id}")
-    public Response deleteUserInfo(@ApiParam(value = "User ID", required = true) @PathVariable int id) {
+    public Response deleteUserInfo(@ApiParam(value = "User ID", required = true) @PathVariable Long id) {
         userService.deleteUserInfo(id);
         return Response.success();
     }

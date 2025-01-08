@@ -50,7 +50,7 @@ class UserControllerTest {
     public void findUserTest() throws Exception {
 
         // given
-        int id = 1;
+        Long id = 1L;
 
         // when, then
         mockMvc.perform(
@@ -64,7 +64,7 @@ class UserControllerTest {
     public void editUserInfoTest() throws Exception {
 
         // given
-        int id = 1;
+        Long id = 1L;
         UserDto userDto = new UserDto(1, "username", "name", "nickname");
 
         // when, then
