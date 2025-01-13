@@ -37,9 +37,10 @@ public class Image extends EntityDate {
 
     private final static List<String> supportedExtensions = List.of("jpg", "jpeg", "gif", "bmp", "png");
 
+    // from 메서드가 호출되면 image class method 작동.
     private Image(final String originName) {
-        this.originName = originName;
-        this.uniqueName = generateUniqueName(extractExtension(originName));
+        this.originName = originName; // 원본 파일명 필드에 저장.
+        this.uniqueName = generateUniqueName(extractExtension(originName)); // 고유 이름 생성.
     }
 
     public static Image from(final String originName) {
@@ -52,14 +53,16 @@ public class Image extends EntityDate {
         }
     }
 
+    // 고유 이름 생성
     private String generateUniqueName(final String extension) {
         return UUID.randomUUID() + "." + extension;
     }
 
+    // 확정자 추출 & 검증
     private String extractExtension(final String originName) {
         String extension = originName.substring(originName.lastIndexOf(".") + 1);
 
-        if (isSupportedFormat(extension)) {
+        if (isSupportedFormat(extension)) { // 파일 확장자 검증
             return extension;
         }
 

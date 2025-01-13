@@ -65,7 +65,7 @@ class UserControllerTest {
 
         // given
         Long id = 1L;
-        UserDto userDto = new UserDto(1, "username", "name", "nickname");
+        UserDto userDto = new UserDto(1L, "username", "name", "nickname");
 
         // when, then
         mockMvc.perform(

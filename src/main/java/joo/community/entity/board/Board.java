@@ -39,7 +39,7 @@ public class Board {
     @OnDelete(action = OnDeleteAction.CASCADE) // User (작성자) 제거 시, 게시글 삭제.
     private User user;
 
-    @OneToMany(mappedBy = "board", cascade = CascadeType.PERSIST, orphanRemoval = true) // image 고아객체 될 경우 DB에서 삭제 
+    @OneToMany(mappedBy = "board", cascade = CascadeType.PERSIST, orphanRemoval = true) // image 고아객체 될 경우 DB에서 삭제
     private List<Image> images;
 
     @DateTimeFormat(pattern = "yyyy-mm-dd")
@@ -59,7 +59,15 @@ public class Board {
         addImages(images); // 코드 중복 방지 & 캡슐화
     }
 
-    // 수정
+    // 이미지 추가
+    private void addImages(List<Image> added) { // 업로드된 이미지 파일 이름을 기반으로 Image.from() 호출
+        added.stream().forEach(i -> {
+            images.add(i);
+            i.initBoard(this);
+        });
+    }
+
+    // 수정 (title, content, add/delete image)
     public ImageUpdatedResult update(BoardUpdateRequest req) {
         this.title = req.getTitle();
         this.content = req.getContent();
@@ -69,45 +77,44 @@ public class Board {
         return result;
     }
 
-    // 이미지 추가
-    private void addImages(List<Image> added) { // 업로드된 이미지 파일 이름을 기반으로 Image.from() 호출
-        added.stream().forEach(i -> {
-            images.add(i);
-            i.initBoard(this);
-        });
-    }
-
     // 이미지 삭제
     private void deleteImages(List<Image> deleted) {
         deleted.stream().forEach(di -> this.images.remove(di));
     }
 
+    // BoardUpdateRequest 받은 image 정보로, add/delete List<image> create
+    // 각 변호나 메서드는 입력 데이터를 image 객체 리스트로 처리
     private ImageUpdatedResult findImageUpdatedResult(List<MultipartFile> addedImageFiles, List<Integer> deletedImageIds) {
         List<Image> addedImages = convertImageFilesToImages(addedImageFiles);
         List<Image> deletedImages = convertImageIdsToImages(deletedImageIds);
         return new ImageUpdatedResult(addedImageFiles, addedImages, deletedImages);
     }
 
-    private List<Image> convertImageIdsToImages(List<Integer> imageIds) {
-        return imageIds.stream()
-                .map(id -> convertImageIdToImage(id))
-                .filter(i -> i.isPresent())
-                .map(i -> i.get())
-                .collect(toList());
-    }
-
-    private Optional<Image> convertImageIdToImage(int id) {
-        return this.images.stream()
-                .filter(i -> i.getId() == (id)).findAny();
-    }
+    // MultipartFile -> Image 객체 리스트 변환
+    // getOriginalFileName() 을 from 정적 메서드에 전달하여 Image 객체 생성
     private List<Image> convertImageFilesToImages(List<MultipartFile> imageFiles) {
         return imageFiles.stream()
                 .map(imageFile -> Image.from(imageFile.getOriginalFilename())).collect(toList());
     }
 
+    // imageIds 를 이용해 기존 Images -> Image 객체 변환
+    private List<Image> convertImageIdsToImages(List<Integer> imageIds) {
+        return imageIds.stream()
+                .map(this::convertImageIdToImage) // 람다식을 메서드 참조로 변경
+                .filter(Optional::isPresent) // get() 호출 전, isPresent() 체크, NullPointerException 방지.
+                .map(Optional::get) // Optional 의 get 을 메서드 참조로 사용
+                .collect(toList());
+    }
+
+    // 특정 ID 를 가진 Image 객체를 찾는다.
+    private Optional<Image> convertImageIdToImage(int id) {
+        return this.images.stream()
+                .filter(i -> i.getId() == (id)).findAny(); // 첫 번째 일치하는 객체를 반환(Optional<Image>)
+    }
+
     @Getter
     @AllArgsConstructor
-    public static class ImageUpdatedResult {
+    public static class ImageUpdatedResult { // 캡슐화하여 추가 및 삭제 리스트 관리
         private java.util.List<MultipartFile> addedImageFiles;
         private java.util.List<Image> addedImages;
         private java.util.List<Image> deletedImages;
