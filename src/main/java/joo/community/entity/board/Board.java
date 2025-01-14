@@ -23,6 +23,13 @@ import static java.util.stream.Collectors.toList;
 @Entity
 public class Board {
 
+    /*
+        conver~ method 클라이언트에서 전달받은 데이터는 일반적 (file, id등) 형태
+        이 데이터를 entity 객체로 변환하여 domain model 사용 형태로 변환
+        ex)
+            MultipartFile -> Image, imageIds -> Image
+     */
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

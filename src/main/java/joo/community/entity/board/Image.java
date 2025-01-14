@@ -38,7 +38,7 @@ public class Image extends EntityDate {
     private final static List<String> supportedExtensions = List.of("jpg", "jpeg", "gif", "bmp", "png");
 
     // from 메서드가 호출되면 image class method 작동.
-    private Image(final String originName) {
+    public Image(final String originName) {
         this.originName = originName; // 원본 파일명 필드에 저장.
         this.uniqueName = generateUniqueName(extractExtension(originName)); // 고유 이름 생성.
     }
