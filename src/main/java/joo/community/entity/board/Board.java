@@ -9,7 +9,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,19 +49,30 @@ public class Board {
     @OneToMany(mappedBy = "board", cascade = CascadeType.PERSIST, orphanRemoval = true) // image 고아객체 될 경우 DB에서 삭제
     private List<Image> images;
 
-    @DateTimeFormat(pattern = "yyyy-mm-dd")
-    private LocalDate createDate; // 날짜
+    @DateTimeFormat(pattern = "yyyy-mm-dd-ss")
+    private LocalDateTime createDate; // 날짜
+
+    @Column(nullable = true)
+    private int liked; // 추천 수
+
+    @Column(nullable = true)
+    private int favorited; // 즐겨찾기 수
 
     @PrePersist // DB에 INSERT 되기 직전에 실행. 즉 DB에 값을 넣으면 자동으로 실행됨
-    public void createDate() {
-        this.createDate = LocalDate.now();
+    public void createDate() { // LocalDate : 날짜, LocalDateTime : 날짜 + 시간
+        this.createDate = LocalDateTime.now();
     }
 
     // 추가 생성자 (명확한 객체 생성)
-    public Board(String title, String content, User user, List<Image> images) {
+    public Board(String title,
+                 String content,
+                 User user,
+                 List<Image> images) {
         this.title = title;
         this.content = content;
         this.user = user;
+        this.liked = 0;
+        this.favorited = 0;
         this.images = new ArrayList<>();
         addImages(images); // 코드 중복 방지 & 캡슐화
     }

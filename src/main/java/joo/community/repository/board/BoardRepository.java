@@ -7,11 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
-public interface BoardRepository extends JpaRepository<Board, Integer> {
+// findBoard(Long id) 로 인한 JpaRepository<Board, Integer -> Long)>
+public interface BoardRepository extends JpaRepository<Board, Long> {
 
     // 검색
     List<Board> findByTitleContaining(String keyword, Pageable pageable);
     // 전체 게시글
     Page<Board> findAll(Pageable pageable);
-
 }
