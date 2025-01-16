@@ -34,7 +34,7 @@ public class BoardController {
     @PostMapping("/boards")
     @ResponseStatus(HttpStatus.CREATED)
     public Response create(@Valid @ModelAttribute BoardCreateRequest req) {
-        return Response.success(boardService.create(req));
+        return Response.success(boardService.createBoard(req));
     }
 
     // DESC 사용 이유 : 최신순으로 보기 위해서
@@ -74,7 +74,7 @@ public class BoardController {
     @ApiOperation(value = "게시글 검색", notes = "게시글을 검색합니다.")
     @GetMapping("/boards/search")
     @ResponseStatus(HttpStatus.OK)
-    public Response search(String keyword, @PageableDefault(size = 5, sort.direction = Sort.Direction.DESC) Pageable pageable) {
+    public Response search(String keyword, @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
         return Response.success(boardService.search(keyword, pageable));
     }
 }

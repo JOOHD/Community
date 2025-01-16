@@ -6,6 +6,10 @@ spring:
     path-match:
       matching-strategy: ant_path_matcher
 
+  # image upload
+  servlet.multipart.max-file-size: 3MB
+  servlet.multipart.max-request-size: 3MB
+
   datasource:
     url: jdbc:mysql://localhost:3306/community?serverTimezone=UTC&characterEncoding=UTF-8
     username: root

@@ -61,11 +61,9 @@ public class Image extends EntityDate {
     // 확정자 추출 & 검증
     private String extractExtension(final String originName) {
         String extension = originName.substring(originName.lastIndexOf(".") + 1);
-
         if (isSupportedFormat(extension)) { // 파일 확장자 검증
             return extension;
         }
-
         throw new UnsupportedImageFormatException();
     }
 
@@ -73,8 +71,4 @@ public class Image extends EntityDate {
         return supportedExtensions.stream()
                 .anyMatch(supportedExtension -> supportedExtension.equalsIgnoreCase(extension));
     }
-
-//    public boolean isSameImageId(final int id) {
-//        return this.getId() == id;
-//    }
 }
