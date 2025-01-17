@@ -36,7 +36,8 @@ public class WebConfig  implements WebMvcConfigurer {
     }
 
     @Override
-    public Validator getValidator() {
+    public Validator getValidator() { // @Valid 사용 검증을 트리거하는 데 사용된다.
+                                      // @RequestBody 로 들어오는 요청 본문이 자동으로 검증
         // LocalValidatorFactoryBean = javax.validation 을 Spring 환경에 통합할 때 사용
         LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
         bean.setValidationMessageSource(messageSource);
