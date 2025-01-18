@@ -130,6 +130,26 @@ public class Board {
                 .filter(i -> i.getId() == (id)).findAny(); // 첫 번째 일치하는 객체를 반환(Optional<Image>)
     }
 
+    // 좋아요 증가
+    public void increaseLikeCount() {
+        this.liked += 1;
+    }
+
+    // 좋아요 감소
+    public void decreaseLikeCount() {
+        this.liked -= 1;
+    }
+
+    // 즐겨찾기 추가
+    public void increaseFavoriteCount() {
+        this.favorited += 1;
+    }
+
+    // 즐겨찾기 취소
+    public void decreaseFavoriteCount() {
+        this.favorited -= 1;
+    }
+
     @Getter
     @AllArgsConstructor
     public static class ImageUpdatedResult { // 캡슐화하여 추가 및 삭제 리스트 관리

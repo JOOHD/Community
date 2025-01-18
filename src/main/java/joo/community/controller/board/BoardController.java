@@ -3,8 +3,10 @@ package joo.community.controller.board;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import joo.community.config.guard.JwtAuth;
 import joo.community.dto.board.BoardCreateRequest;
 import joo.community.dto.board.BoardUpdateRequest;
+import joo.community.entity.user.User;
 import joo.community.response.Response;
 import joo.community.service.board.BoardService;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +35,7 @@ public class BoardController {
     @ApiOperation(value = "게시글 생성", notes = "게시글을 작성합니다.")
     @PostMapping("/boards")
     @ResponseStatus(HttpStatus.CREATED)
-    public Response create(@Valid @ModelAttribute BoardCreateRequest req) {
+    public Response createBoard(@Valid @ModelAttribute BoardCreateRequest req) {
         return Response.success(boardService.createBoard(req));
     }
 
@@ -75,6 +77,29 @@ public class BoardController {
     @GetMapping("/boards/search")
     @ResponseStatus(HttpStatus.OK)
     public Response search(String keyword, @PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        return Response.success(boardService.search(keyword, pageable));
+        return Response.success(boardService.searchBoard(keyword, pageable));
     }
+
+    @PostMapping("/boards/{id}/{action}")
+    public Response processBoardAction(@PathVariable Long id, @PathVariable String action, @JwtAuth User user) {
+        return Response.success(boardService.processBoardAndFavoriteState(id, user, action));
+    }
+
+    /*
+    @ApiOperation(value = "게시글 좋아요", notes = "사용자가 게시글 좋아요를 누릅니다.")
+    @PostMapping("/boards/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public Response likeBoard(@ApiParam(value = "게시글 id", required = true) @PathVariable Long id,
+                              @JwtAuth User user) {
+        return Response.success(boardService.likeBoard(id, user));
+    }
+
+    @ApiOperation(value = "게시글 즐겨찾기", notes = "사용자가 게시글 즐겨찾기를 누릅니다.")
+    @PostMapping("/boards/{id}/favorites")
+    @ResponseStatus(HttpStatus.OK)
+    public Response favoriteBoard(@ApiParam(value = "게시글 id", required = true) @PathVariable final Long id,
+                                  @JwtAuth User user) {
+        return Response.success(boardService.favoriteBoard(id, user));
+    }
+     */
 }

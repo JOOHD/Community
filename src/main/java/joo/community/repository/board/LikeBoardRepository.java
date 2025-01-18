@@ -10,6 +10,6 @@ import java.util.Optional;
 public interface LikeBoardRepository  extends JpaRepository<LikeBoard, Long> {
 
     // 좋아요 누른 회원 찾기
-    LikeBoard findByBoardAndUser(Board board, User user);
+    Optional<LikeBoard> findByBoardAndUser(Board board, User user);
 }
 
