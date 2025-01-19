@@ -1,6 +1,7 @@
 package joo.community.service.board;
 
 import joo.community.dto.board.*;
+import joo.community.dto.user.UserDto;
 import joo.community.entity.board.Board;
 import joo.community.entity.board.Favorite;
 import joo.community.entity.board.Image;
@@ -21,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -30,6 +30,16 @@ import static java.util.stream.Collectors.toList;
 @RequiredArgsConstructor
 @Service
 public class BoardService {
+
+    private static final String SUCCESS_LIKE_BOARD = "좋아요 처리 완료";
+    private static final String SUCCESS_UNLIKE_BOARD = "좋아요 취소 완료";
+    private static final String SUCCESS_FAVORITE_BOARD = "즐겨찾기 처리 완료";
+    private static final String SUCCESS_UNFAVORITE_BOARD = "즐겨찾기 취소 완료";
+
+    private static final int RECOMMEND_SET_COUNT = 10;
+
+    private static final int PAGE_SIZE = 10;
+
 
     // final 이 붙은 필드에 대해 @RequiredArgsConstructor 생성자 자동 생성.
     private final UserRepository userRepository;
@@ -89,7 +99,6 @@ public class BoardService {
         deleteImages(result.getDeletedImages());
 
         return BoardResponseDto.toDto(board, user.getNickname());
-
     }
 
     // 게시글 삭제
@@ -111,40 +120,19 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
 
-    /*
-    @Transactional
-    public String likeBoard(Long id, User user) {
-        Board board = boardRepository.findById(id)
-                .orElseThrow(BoardNotFoundException::new);
-
-        LikeBoard likeBoard = likeBoardRepository.findByBoardAndUser(board, user)
-                .orElse(null);
-
-        if (likeBoard == null) {
-            // 유저가 글에 처음 좋아요를 누른 경우
-            board.setLiked(board.getLiked() + 1); // 좋아요 수 증가
-            LikeBoard newLikeBoard = new LikeBoard(board, user);
-            likeBoardRepository.save(newLikeBoard); // LikeBoard 테이블 생성
-            return "좋아요 처리 완료";
-        } else {
-            // 유저가 이미 좋아요를 누른 경우 (좋아요 취소)
-            board.setLiked(board.getLiked() - 1); // 좋아요 수 감소
-            likeBoardRepository.delete(likeBoard); // LikeBoard 테이블 삭제
-            return "좋아요 취소";
-        }
-    }
-    */
-
     // 게시글 좋아요 & 즐겨찾기
-    @Transactional
-    public String processBoardAndFavoriteState(Long id, User user, String action) {
+    @Transactional // userDto (DTO), user (Entity)
+    public String likeAndFavoriteState(Long id, UserDto userDto, String action) {
         Board board = boardRepository.findById(id)
                 .orElseThrow(BoardNotFoundException::new);
+
+        // UserDto -> User entity 변환
+        User user = userDto.toEntity();
 
         if ("like".equals(action)) {
-            return processLikeState(board, user);
+            return likeState(board, user);
         } else if ("favorite".equals(action)) {
-            return processFavoriteState(board, user);
+            return favoriteState(board, user);
         }
         throw new IllegalArgumentException("Invalid action: " + action);
     }
@@ -183,7 +171,8 @@ public class BoardService {
         }
     }
 
-    private String processLikeState(Board board, User user) {
+    // 
+    private String likeState(Board board, User user) {
         LikeBoard likeBoard = likeBoardRepository.findByBoardAndUser(board, user)
                 .orElse(null);
 
@@ -191,16 +180,16 @@ public class BoardService {
             // 유저가 글에 처음 좋아요를 누른 경우
             board.setLiked(board.getLiked() + 1); // 좋아요 수 증가
             likeBoardRepository.save(new LikeBoard(board, user)); // LikeBoard 테이블 생성
-            return "좋아요 처리 완료";
+            return SUCCESS_LIKE_BOARD;
         } else {
             // 유저가 이미 좋아요를 누른 경우 (좋아요 취소)
             board.setLiked(board.getLiked() - 1); // 좋아요 수 감소
             likeBoardRepository.delete(likeBoard); // LikeBoard 테이블 삭제
-            return "좋아요 취소";
+            return SUCCESS_UNLIKE_BOARD;
         }
     }
 
-    private String processFavoriteState(Board board, User user) {
+    private String favoriteState(Board board, User user) {
         Favorite favorite = favoriteRepository.findByBoardAndUser(board, user)
                 .orElse(null);
 
@@ -208,53 +197,13 @@ public class BoardService {
             // 유저가 글을 처음 즐겨찾기한 경우
             board.setFavorited(board.getFavorited() + 1); // 즐겨찾기 수 증가
             favoriteRepository.save(new Favorite(board, user)); // Favorite 테이블 생성
-            return "즐겨찾기 처리 완료";
+            return SUCCESS_FAVORITE_BOARD;
         } else {
             // 유저가 이미 즐겨찾기한 경우 (즐겨찾기 취소)
             board.setFavorited(board.getFavorited() - 1); // 즐겨찾기 수 감소
             favoriteRepository.delete(favorite); // Favorite 테이블 삭제
-            return "즐겨찾기 취소";
+            return SUCCESS_UNFAVORITE_BOARD;
         }
     }
 
-    // 좋아요 확인
-    public boolean hasLikeBoard(Board board, User user) {
-        return likeBoardRepository.findByBoardAndUser(board, user)
-                .isPresent();
-    }
-
-    // 좋아요 생성
-    public String createLikeBoard(Board board, User user) {
-        LikeBoard likeBoard = new LikeBoard(board, user);
-        likeBoardRepository.save(likeBoard);
-        return "좋아요 처리 완료";
-    }
-
-    // 좋아요 제거
-    private String removeLikeBoard(Board board, User user) {
-        LikeBoard likeBoard = likeBoardRepository.findByBoardAndUser(board, user)
-                .orElseThrow(LikeHistoryNotfoundException::new);
-        likeBoardRepository.delete(likeBoard);
-        return "좋아요 취소 완료";
-    }
-
-    // 즐겨찾기 여부 확인
-    private boolean hasFavoriteBoard(Board board, User user) {
-        return favoriteRepository.findByBoardAndUser(board, user).isPresent();
-    }
-    
-    // 즐겨찾기 추가
-    public String createFavoriteBoard(Board board, User user) {
-        Favorite favorite = new Favorite(board, user);
-        favoriteRepository.save(favorite);
-        return "즐겨찾기 추가"; // enum 상수로 리팩토링
-    }
-    
-    // 즐겨찾기 제거
-    public String removeFavoriteBoard(Board board, User user) {
-        Favorite favorite = favoriteRepository.findByBoardAndUser(board, user)
-                .orElseThrow(FavoriteNotFoundException::new);
-        favoriteRepository.delete(favorite);
-        return "즐겨찾기 취소"; // enum 상수로 리팩토링
-    }
 }

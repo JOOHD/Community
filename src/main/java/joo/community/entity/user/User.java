@@ -41,4 +41,7 @@ public class User {
         this.password = password;
         this.authority = authority;
     }
+
+    // UserDto를 User entity 로 변환을 위한 메소드 생성.
+    public User(Long id, String username, String name, String nickname) {}
 }

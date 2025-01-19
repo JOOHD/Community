@@ -22,7 +22,7 @@ public class UserDto {
         this.nickname = nickname;
     }
 
-    // User 객체를 UserDto로 변환하는 메서드
+    // User entity 객체를 UserDto dto 로 변환.
     public static UserDto toDto(User user) {
         return UserDto.builder()
                 .id(user.getId())
@@ -30,5 +30,10 @@ public class UserDto {
                 .name(user.getName())
                 .nickname(user.getNickname())
                 .build();
+    }
+
+    // UserDto를 User entity 로 변환.
+    public User toEntity() {
+        return new User(id, username, name, nickname);
     }
 }
