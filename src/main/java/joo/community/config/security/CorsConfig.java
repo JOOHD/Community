@@ -13,8 +13,8 @@ public class CorsConfig {
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        // config.addAllowedOrigin("^https?:\\/\\/https://main--chimerical-malabi-ffde60.netlify.app/$"); // e.g. /**, http://domain1.com
-        config.addAllowedOrigin("*");
+        config.addAllowedOrigin("^https?:\\/\\/https://main--chimerical-malabi-ffde60.netlify.app/$"); // e.g. /**, http://domain1.com
+
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         config.setAllowCredentials(true);
@@ -23,4 +23,5 @@ public class CorsConfig {
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
+
 }

@@ -1,46 +1,61 @@
 package joo.community.config;
 
+import joo.community.config.guard.LoginMemberArgumentResolver;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.CacheControl;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.time.Duration;
+import java.util.List;
 
 @EnableWebMvc
 @Configuration
-@RequiredArgsConstructor
-public class WebConfig  implements WebMvcConfigurer {
+@PropertySource("classpath:application.yml")
+public class WebConfig implements WebMvcConfigurer {
 
+    private final LoginMemberArgumentResolver loginMemberArgumentResolver;
     private final MessageSource messageSource;
-    private String location = "/Users/user/image/";
 
-    /*
-        -messages.properties
-        ex)
-            NotNull.user.name=사용자 이름은 필수입니다.
-            Size.user.password=비밀번호는 최소 {min}자 이상이어야 합니다.
-     */
+//    @Value("${upload.image.location}")
+//    private String location;
+
+    public WebConfig(final LoginMemberArgumentResolver loginMemberArgumentResolver, final MessageSource messageSource) {
+        this.loginMemberArgumentResolver = loginMemberArgumentResolver;
+        this.messageSource = messageSource;
+    }
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/image/**")
-                .addResourceLocations("file:" + location)
-                // image 접근할 때마다, 캐시 이용 제한 1시간, 지나면 재요청
+//                .addResourceLocations("file:" + location)
                 .setCacheControl(CacheControl.maxAge(Duration.ofHours(1L)).cachePublic());
     }
 
     @Override
-    public Validator getValidator() { // @Valid 사용 검증을 트리거하는 데 사용된다.
-                                      // @RequestBody 로 들어오는 요청 본문이 자동으로 검증
-        // LocalValidatorFactoryBean = javax.validation 을 Spring 환경에 통합할 때 사용
+    public Validator getValidator() {
         LocalValidatorFactoryBean bean = new LocalValidatorFactoryBean();
         bean.setValidationMessageSource(messageSource);
         return bean;
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOrigins("http://localhost:3000");
+    }
+
+    @Override
+    public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(loginMemberArgumentResolver);
     }
 }

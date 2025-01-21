@@ -16,6 +16,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.List;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -46,11 +49,20 @@ public class SecurityConfig {
                 .antMatchers("/swagger-ui/**", "/v3/**", "/swagger-resources/**");
     }
 
-    @Bean
+    @Bean // Spring Security 5 이상에서 권장되는 방식인 SecurityFilterChain을 사용
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         // CSRF 설정 Disable
-        http.csrf().disable()
+        http.
+                cors().configurationSource(request -> {
+                    CorsConfiguration cors = new CorsConfiguration();
+                    cors.setAllowedOrigins(List.of("http://localhost:3000"));
+                    cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+                    cors.setAllowedHeaders(List.of("*"));
+                    return cors;
+                });
+        http.
+                csrf().disable()
                 .formLogin().disable() // 기본 폼 로그인 비활성화
                 .httpBasic().disable() // 기본 HTTP 인증 비활성화
 
@@ -91,7 +103,7 @@ public class SecurityConfig {
                 // JWT 필터 추가
                 .and()
                 .apply(new JwtSecurityConfig(tokenProvider));
-        
+
         return http.build(); // SecurityFilterChain 반환
     }
 }

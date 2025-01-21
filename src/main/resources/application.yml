@@ -1,6 +1,11 @@
 server:
   port: 8080
 
+#logging:
+#  level:
+#     root: INFO
+#     org.springframework.web: DEBUG
+
 spring:
   mvc:
     path-match:
@@ -20,7 +25,7 @@ spring:
     hibernate:
       ddl-auto: update
     database: mysql
-    database-platform: org.hibernate.dialect.MySQLDialect
+    database-platform: org.hibernate.dialect.MySQL8Dialect # MySQL 8.0 이상에서는 'type' 대신 'engine' 키워드 사용.
     show_sql: true
 
 
