@@ -58,7 +58,7 @@ class AuthControllerTest {
     void signUpTest() throws Exception {
 
         // given
-        RegisterDto req = new RegisterDto("test123", "test", "username", "nickname");
+        SignUpRequestDto req = new SignUpRequestDto("test123", "test", "username", "nickname");
 
         // when, then
         mockMvc.perform(
@@ -95,7 +95,7 @@ class AuthControllerTest {
     void ignoreNullValueInJsonResponseTest() throws Exception {
         // 응답결과로 반환되는 JSON 문자열이 올바르게 제거되는지 검증
         // given
-        RegisterDto req = new RegisterDto("test123", "test", "username", "nickname");
+        SignUpRequestDto req = new SignUpRequestDto("test123", "test", "username", "nickname");
 
         // when, then
         mockMvc.perform(

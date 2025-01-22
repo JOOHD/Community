@@ -26,7 +26,7 @@ public class LoginRequestDto {
     @NotBlank(message = "{LoginRequestDto.password.notBlank}")
     private String password;
 
-    public User toMember(PasswordEncoder passwordEncoder) {
+    public User toUsber(PasswordEncoder passwordEncoder) {
         return User.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))

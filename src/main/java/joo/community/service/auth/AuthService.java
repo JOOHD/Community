@@ -1,6 +1,5 @@
 package joo.community.service.auth;
 
-import joo.community.repository.user.UserRepository;
 import joo.community.repository.token.RefreshTokenRepository;
 import joo.community.config.jwt.TokenProvider;
 import joo.community.entity.user.Authority;
@@ -10,6 +9,7 @@ import joo.community.dto.sign.*;
 import joo.community.exception.LoginFailureException;
 import joo.community.exception.MemberNicknameAlreadyExistsException;
 import joo.community.exception.MemberUsernameAlreadyExistsException;
+import joo.community.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -29,7 +29,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public void signup(RegisterDto req) {
+    public void signup(SignUpRequestDto req) {
         validateSignUpInfo(req);
 
         // Builder로 리팩토링 해야함
@@ -106,11 +106,11 @@ public class AuthService {
     }
 
 
-    private void validateSignUpInfo(RegisterDto registerDto) {
-        if (userRepository.existsByUsername(registerDto.getUsername()))
-            throw new MemberUsernameAlreadyExistsException(registerDto.getUsername());
-        if (userRepository.existsByNickname(registerDto.getNickname()))
-            throw new MemberNicknameAlreadyExistsException(registerDto.getNickname());
+    private void validateSignUpInfo(SignUpRequestDto SignUpRequestDto) {
+        if (userRepository.existsByUsername(SignUpRequestDto.getUsername()))
+            throw new MemberUsernameAlreadyExistsException(SignUpRequestDto.getUsername());
+        if (userRepository.existsByNickname(SignUpRequestDto.getNickname()))
+            throw new MemberNicknameAlreadyExistsException(SignUpRequestDto.getNickname());
     }
 
     private void validatePassword(LoginRequestDto loginRequestDto, User user) {

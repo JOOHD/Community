@@ -125,17 +125,4 @@ public class TokenProvider {
             return e.getClaims();
         }
     }
-
-    public boolean isTokenExpired(String token) {
-        try {
-            Claims claims = parseClaims(token);
-            Date expiration = claims.getExpiration();
-            return expiration.before(new Date());
-        } catch (ExpiredJwtException e) {
-            // 만료된 토큰인 경우 true 반환
-            return true;
-        } catch (Exception e) {
-            throw new RuntimeException("토큰 만료 여부 확인 중 오류가 발생했습니다.", e);
-        }
-    }
 }

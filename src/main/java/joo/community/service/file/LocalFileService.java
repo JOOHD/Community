@@ -1,8 +1,9 @@
-package joo.community.service.board;
+package joo.community.service.file;
 
 import joo.community.exception.FileUploadFailureException;
-import joo.community.service.file.FileService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,10 +13,11 @@ import java.io.IOException;
 
 @Service
 @Slf4j
+@PropertySource("classpath:application.yml")
 public class LocalFileService implements FileService {
 
-    // 로컬 서버에서 저장될 저장소 or @Value("$upload.image.location")
-    private static final String location = "/User/user/image/";
+    @Value("${upload.image.location}")
+    private String location;
 
     @PostConstruct
     void postConstruct() {
@@ -29,7 +31,7 @@ public class LocalFileService implements FileService {
     public void upload(MultipartFile file, String filename) {
         try {
             file.transferTo(new File(location + filename));
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new FileUploadFailureException(e);
         }
     }

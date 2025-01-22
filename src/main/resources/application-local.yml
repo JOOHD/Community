@@ -1,0 +1,13 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/community?serverTimezone=UTC&characterEncoding=UTF-8
+    username: root
+    password: 1234
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: ${redis.host:localhost} # 기본값을 localhost로 설정
+    port: ${redis.port:6379}      # 기본값을 6379로 설정
+
+upload:
+  image:
+    location: /User/user/image/

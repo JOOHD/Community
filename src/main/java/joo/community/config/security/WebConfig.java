@@ -1,7 +1,6 @@
-package joo.community.config;
+package joo.community.config.security;
 
 import joo.community.config.guard.LoginMemberArgumentResolver;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Configuration;
@@ -26,8 +25,8 @@ public class WebConfig implements WebMvcConfigurer {
     private final LoginMemberArgumentResolver loginMemberArgumentResolver;
     private final MessageSource messageSource;
 
-//    @Value("${upload.image.location}")
-//    private String location;
+    @Value("${upload.image.location}")
+    private String location;
 
     public WebConfig(final LoginMemberArgumentResolver loginMemberArgumentResolver, final MessageSource messageSource) {
         this.loginMemberArgumentResolver = loginMemberArgumentResolver;
@@ -37,7 +36,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/image/**")
-//                .addResourceLocations("file:" + location)
+                .addResourceLocations("file:" + location)
                 .setCacheControl(CacheControl.maxAge(Duration.ofHours(1L)).cachePublic());
     }
 

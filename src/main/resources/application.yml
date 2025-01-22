@@ -1,32 +1,35 @@
 server:
   port: 8080
 
-#logging:
-#  level:
-#     root: INFO
-#     org.springframework.web: DEBUG
+logging:
+  level:
+    org.springframework.security: TRACE
+    org.springframework.web: TRACE
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
+
 
 spring:
-  mvc:
-    path-match:
-      matching-strategy: ant_path_matcher
-
-  # image upload
-  servlet.multipart.max-file-size: 3MB
-  servlet.multipart.max-request-size: 3MB
-
-  datasource:
-    url: jdbc:mysql://localhost:3306/community?serverTimezone=UTC&characterEncoding=UTF-8
-    username: root
-    password: 1234
-    driver-class-name: com.mysql.cj.jdbc.Driver
+  profiles:
+    active: local
 
   jpa:
     hibernate:
       ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+      use-new-id-generator-mappings: false
     database: mysql
-    database-platform: org.hibernate.dialect.MySQL8Dialect # MySQL 8.0 이상에서는 'type' 대신 'engine' 키워드 사용.
-    show_sql: true
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+        #use_sql_comments: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher # about swagger
 
+  servlet.multipart.max-file-size: 5MB
+  servlet.multipart.max-request-size: 5MB
 
 

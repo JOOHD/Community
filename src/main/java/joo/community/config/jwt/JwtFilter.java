@@ -33,9 +33,9 @@ public class JwtFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
             Authentication authentication = tokenProvider.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
-            filterChain.doFilter(request, response); // 유효성 검증 실패 시, jwtHandler 로 넘겨진다.
         }
+
+        filterChain.doFilter(request, response); // 유효성 검증 실패 시, jwtHandler 로 넘겨진다.
     }
 
     // Request Header 에서 토큰 정보를 꺼내오기
