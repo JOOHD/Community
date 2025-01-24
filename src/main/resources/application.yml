@@ -1,11 +1,11 @@
 server:
   port: 8080
 
-logging:
-  level:
-    org.springframework.security: TRACE
-    org.springframework.web: TRACE
-    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
+#logging:
+#  level:
+#    org.springframework.security: TRACE
+#    org.springframework.web: TRACE
+#    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
 
 
 spring:

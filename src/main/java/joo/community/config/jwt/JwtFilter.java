@@ -29,12 +29,14 @@ public class JwtFilter extends OncePerRequestFilter {
         String jwt = resolveToken(request);
 
         // 2. validateToken 으로 토큰 유효성 검사
-        // 정상 토큰이면 해당 토큰으로 Authentication 을 가져와서 SecurityContext 에 저장.
+        // if = true 토큰이면, 해당 토큰으로 Authentication 을 가져와서 SecurityContext 에 저장.
+        // 토큰 유효성 검사와 관계없이 항상 실행되어야 하는 로직
         if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
             Authentication authentication = tokenProvider.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
+        // if문 안에 있어서, postman response Body 에 응답이 없던 것
         filterChain.doFilter(request, response); // 유효성 검증 실패 시, jwtHandler 로 넘겨진다.
     }
 

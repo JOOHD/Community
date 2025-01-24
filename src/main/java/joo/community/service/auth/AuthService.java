@@ -11,6 +11,7 @@ import joo.community.exception.MemberNicknameAlreadyExistsException;
 import joo.community.exception.MemberUsernameAlreadyExistsException;
 import joo.community.repository.user.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -18,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -29,11 +31,10 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public void signup(SignUpRequestDto req) {
-        validateSignUpInfo(req);
+    public void signup(SignUpRequestDto req, User user) {
+        validateSignUpInfo(req, user);
 
         // Builder로 리팩토링 해야함
-        User user = new User();
         user.setUsername(req.getUsername());
         user.setPassword(passwordEncoder.encode(req.getPassword()));
         user.setNickname(req.getNickname());
@@ -45,10 +46,11 @@ public class AuthService {
 
     @Transactional
     public TokenResponseDto signIn(LoginRequestDto req) {
-        User user = userRepository.findByUsername(req.getUsername()).orElseThrow(() -> {
-            return new LoginFailureException();
-        });
+        log.info("req valid" + req);
+        User user = userRepository.findByUsername(req.getUsername())
+                .orElseThrow(LoginFailureException::new);
 
+        log.info("user valid" + user);
         validatePassword(req, user);
 
         // 1. Login ID/PW 를 기반으로 AuthenticationToken 생성
@@ -57,6 +59,7 @@ public class AuthService {
         // 2. 실제로 검증 (사용자 비밀번호 체크) 이 이루어지는 부분
         //    authenticate 메서드가 실행이 될 때 CustomUserDetailsService 에서 만들었던 loadUserByUsername 메서드가 실행됨
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        log.info("authentication" + authentication);
 
         // 3. 인증 정보를 기반으로 JWT 토큰 생성
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
@@ -106,10 +109,11 @@ public class AuthService {
     }
 
 
-    private void validateSignUpInfo(SignUpRequestDto SignUpRequestDto) {
-        if (userRepository.existsByUsername(SignUpRequestDto.getUsername()))
+    private void validateSignUpInfo(SignUpRequestDto SignUpRequestDto, User user) {
+        if (userRepository.existsByUsername(SignUpRequestDto.getUsername())) {
+            log.warn("Invalid password for user: " + user.getUsername());
             throw new MemberUsernameAlreadyExistsException(SignUpRequestDto.getUsername());
-        if (userRepository.existsByNickname(SignUpRequestDto.getNickname()))
+        } else if (userRepository.existsByNickname(SignUpRequestDto.getNickname()))
             throw new MemberNicknameAlreadyExistsException(SignUpRequestDto.getNickname());
     }
 
