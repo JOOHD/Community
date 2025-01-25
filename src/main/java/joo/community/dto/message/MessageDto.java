@@ -1,4 +1,4 @@
-package joo.community.dto.user;
+package joo.community.dto.message;
 
 import joo.community.entity.user.Message;
 import lombok.AllArgsConstructor;

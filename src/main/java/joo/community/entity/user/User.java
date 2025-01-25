@@ -1,6 +1,7 @@
 package joo.community.entity.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import joo.community.entity.common.EntityDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +15,9 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Entity
 @Builder
-public class User {
+@Table(name = "user")
+public class User extends EntityDate  {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,13 +37,6 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private Authority authority;
-
-    @Builder
-    public User(String username, String password, Authority authority) {
-        this.username = username;
-        this.password = password;
-        this.authority = authority;
-    }
 
     // UserDto를 User entity 로 변환을 위한 메소드 생성.
     public User(Long id, String username, String name, String nickname) {}

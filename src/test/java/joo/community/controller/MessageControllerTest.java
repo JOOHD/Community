@@ -2,7 +2,7 @@ package joo.community.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import joo.community.controller.message.MessageController;
-import joo.community.dto.user.MessageCreateRequest;
+import joo.community.dto.message.MessageCreateRequest;
 import joo.community.service.message.MessageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

@@ -1,7 +1,7 @@
 package joo.community.service.message;
 
-import joo.community.dto.user.MessageCreateRequest;
-import joo.community.dto.user.MessageDto;
+import joo.community.dto.message.MessageCreateRequest;
+import joo.community.dto.message.MessageDto;
 import joo.community.entity.user.Message;
 import joo.community.entity.user.User;
 import joo.community.exception.MemberNotEqualsException;

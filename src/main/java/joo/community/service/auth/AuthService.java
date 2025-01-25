@@ -31,37 +31,36 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public void signup(SignUpRequestDto req, User user) {
-        validateSignUpInfo(req, user);
-
-        // Builder로 리팩토링 해야함
-        user.setUsername(req.getUsername());
-        user.setPassword(passwordEncoder.encode(req.getPassword()));
-        user.setNickname(req.getNickname());
-        user.setName(req.getName());
-        user.setAuthority(Authority.ROLE_USER);
+    public User signup(SignUpRequestDto req) {
+        validateSignUpInfo(req);
+        User user = createSignupFormOfUser(req);
         userRepository.save(user);
+        return user;
     }
 
 
     @Transactional
     public TokenResponseDto signIn(LoginRequestDto req) {
-        log.info("req valid" + req);
+        log.info("Finding user by username: {}", req.getUsername());
         User user = userRepository.findByUsername(req.getUsername())
-                .orElseThrow(LoginFailureException::new);
+                .orElse(null);
 
-        log.info("user valid" + user);
+        if (user == null) {
+            log.info("User not found for username: {}", req.getUsername());
+            throw new LoginFailureException();
+        }
+
+        log.info("User found: {}", user);
+
         validatePassword(req, user);
-
         // 1. Login ID/PW 를 기반으로 AuthenticationToken 생성
         UsernamePasswordAuthenticationToken authenticationToken = req.toAuthentication();
 
         // 2. 실제로 검증 (사용자 비밀번호 체크) 이 이루어지는 부분
         //    authenticate 메서드가 실행이 될 때 CustomUserDetailsService 에서 만들었던 loadUserByUsername 메서드가 실행됨
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-        log.info("authentication" + authentication);
 
-        // 3. 인증 정보를 기반으로 JWT 토큰 생성
+        // 3. 인증 정보를 기반으로  JWT 토큰 생성
         TokenDto tokenDto = tokenProvider.generateTokenDto(authentication);
 
         // 4. RefreshToken 저장
@@ -72,6 +71,7 @@ public class AuthService {
 
         refreshTokenRepository.save(refreshToken);
         TokenResponseDto tokenResponseDto = new TokenResponseDto(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
+
         // 5. 토큰 발급
         return tokenResponseDto;
     }
@@ -108,12 +108,20 @@ public class AuthService {
         return tokenResponseDto;
     }
 
+    private User createSignupFormOfUser(final SignUpRequestDto req) {
+        return User.builder()
+                .username(req.getUsername())
+                .password(passwordEncoder.encode(req.getPassword()))
+                .nickname(req.getNickname())
+                .name(req.getName())
+                .authority(Authority.ROLE_USER)
+                .build();
+    }
 
-    private void validateSignUpInfo(SignUpRequestDto SignUpRequestDto, User user) {
-        if (userRepository.existsByUsername(SignUpRequestDto.getUsername())) {
-            log.warn("Invalid password for user: " + user.getUsername());
+    private void validateSignUpInfo(SignUpRequestDto SignUpRequestDto) {
+        if (userRepository.existsByUsername(SignUpRequestDto.getUsername()))
             throw new MemberUsernameAlreadyExistsException(SignUpRequestDto.getUsername());
-        } else if (userRepository.existsByNickname(SignUpRequestDto.getNickname()))
+        if (userRepository.existsByNickname(SignUpRequestDto.getNickname()))
             throw new MemberNicknameAlreadyExistsException(SignUpRequestDto.getNickname());
     }
 

@@ -2,7 +2,7 @@ package joo.community.controller.message;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import joo.community.dto.user.MessageCreateRequest;
+import joo.community.dto.message.MessageCreateRequest;
 import joo.community.response.Response;
 import joo.community.service.message.MessageService;
 import lombok.RequiredArgsConstructor;
