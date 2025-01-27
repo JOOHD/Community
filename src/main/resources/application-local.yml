@@ -11,3 +11,6 @@ spring:
 upload:
   image:
     location: /User/user/image/
+
+jwt:
+  secret: ""

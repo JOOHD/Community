@@ -31,7 +31,7 @@ public class AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
-    public User signup(SignUpRequestDto req) {
+    public User signUp(SignUpRequestDto req) {
         validateSignUpInfo(req);
         User user = createSignupFormOfUser(req);
         userRepository.save(user);
@@ -41,16 +41,8 @@ public class AuthService {
 
     @Transactional
     public TokenResponseDto signIn(LoginRequestDto req) {
-        log.info("Finding user by username: {}", req.getUsername());
         User user = userRepository.findByUsername(req.getUsername())
-                .orElse(null);
-
-        if (user == null) {
-            log.info("User not found for username: {}", req.getUsername());
-            throw new LoginFailureException();
-        }
-
-        log.info("User found: {}", user);
+                .orElseThrow(LoginFailureException::new);
 
         validatePassword(req, user);
         // 1. Login ID/PW 를 기반으로 AuthenticationToken 생성
