@@ -15,7 +15,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,8 +30,10 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.mockito.Mockito.isNull;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
@@ -95,14 +100,15 @@ class BoardControllerTest {
     }
 
     @Test
-    @DisplayName("전체 게시물 조회한다. (페이징)")
-    void find_all_boards_success_with_paging() throws Exception {
+    @DisplayName("전체 게시물 조회 (페이징)")
+    public void findAllBoardsTest() throws Exception {
         // given
         Pageable pageable = PageRequest.of(0, 5, Sort.Direction.DESC, "id");
         Page<Board> result = boardRepository.findAll(pageable);
 
         // when, then
-        assertThat(result).isEqualTo(isNull());
+        assertThat(result).isEqualTo(null);
+
     }
 
     @Test

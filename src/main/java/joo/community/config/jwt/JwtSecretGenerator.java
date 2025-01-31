@@ -8,13 +8,10 @@ import javax.crypto.SecretKey;
 import java.util.Base64;
 
 @Slf4j
-public class JwtSecretKey {
-
-    public JwtSecretKey() {
-        // HS512에 적합한 안전한 크기의 키 생성
+public class JwtSecretGenerator {
+    public static void main(String[] args) {
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS512);
-
-        // 키 확인
-        System.out.println("Generated Key: " + key);
+        String base64Key = Base64.getEncoder().encodeToString(key.getEncoded());
+        log.info("Generated JWT Secret Key : " + base64Key);
     }
 }

@@ -67,7 +67,7 @@ class AuthControllerTest {
                                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated());
 
-        verify(authService).signup(req);
+        verify(authService).signUp(req);
     }
 
     @DisplayName("로그인 테스트")

@@ -40,7 +40,11 @@ public class TokenProvider {
     private final Key key;
 
     public TokenProvider(@Value("${jwt.secret}") String secretKey) {
+        log.info("secretKey : " + secretKey);
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        if (keyBytes.length < 64) {
+            throw new IllegalArgumentException("jwt.secret 키 길이가 너무 짧습니다. 최소 512비트(64바이트) 이상이어야 합니다.");
+        }
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 

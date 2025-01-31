@@ -30,13 +30,19 @@ public class SecurityConfig {
 
     private static final String API_MESSAGES = "/api/messages";
     private static final String API_MESSAGES_SENDER = "/api/messages/sender";
-    private static final String API_MESSAGES_SENDER_WITH_ID = "/api/messages/sender/{id}";
+    private static final String API_MESSAGES_SENDER_ID = "/api/messages/sender/{id}";
     private static final String API_MESSAGES_RECEIVER = "/api/messages/receiver";
-    private static final String API_MESSAGES_RECEIVER_WITH_ID = "/api/messages/receiver/{id}";
+    private static final String API_MESSAGES_RECEIVER_ID = "/api/messages/receiver/{id}";
 
     private static final String ROLE_USER_OR_ADMIN = "hasRole('ROLE_USER') or hasRole('ROLE_ADMIN')";
     private static final String API_USERS = "/api/users";
-    private static final String API_USERS_WITH_ID = "/api/users/{id}";
+    private static final String API_USERS_ID = "/api/users/{id}";
+    
+    private static final String API_BOARDS = "/api/boards";
+    private static final String API_BOARDS_ALL = "/api/boards/**";
+    private static final String API_BOARDS_ID = "/api/boards/{id}";
+    private static final String API_BOARDS_BEST = "/api/boards/best";
+    private static final String API_BOARDS_ID_FAVORITE = "/api/boards/{id}/favorite";
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -86,18 +92,30 @@ public class SecurityConfig {
                 .antMatchers("/swagger-ui/**", "/v3/**", "/test").permitAll() // swagger
 
                 // API 경로별 권한 설정
+                // USERS
                 .antMatchers(HttpMethod.GET, API_USERS).access(ROLE_USER_OR_ADMIN)
-                .antMatchers(HttpMethod.GET, API_USERS_WITH_ID).access(ROLE_USER_OR_ADMIN)
-                .antMatchers(HttpMethod.PUT, API_USERS_WITH_ID).access(ROLE_USER_OR_ADMIN)
-                .antMatchers(HttpMethod.DELETE, API_USERS_WITH_ID).access(ROLE_USER_OR_ADMIN)
+                .antMatchers(HttpMethod.GET, API_USERS_ID).access(ROLE_USER_OR_ADMIN)
+                .antMatchers(HttpMethod.PUT, API_USERS_ID).access(ROLE_USER_OR_ADMIN)
+                .antMatchers(HttpMethod.DELETE, API_USERS_ID).access(ROLE_USER_OR_ADMIN)
 
+                // MESSAGE
                 .antMatchers(HttpMethod.POST, API_MESSAGES).authenticated() // 메시지 전송은 인증 필요
                 .antMatchers(HttpMethod.GET, API_MESSAGES_SENDER).access(ROLE_USER_OR_ADMIN)
-                .antMatchers(HttpMethod.GET, API_MESSAGES_SENDER_WITH_ID).access(ROLE_USER_OR_ADMIN)
+                .antMatchers(HttpMethod.GET, API_MESSAGES_SENDER_ID).access(ROLE_USER_OR_ADMIN)
                 .antMatchers(HttpMethod.GET, API_MESSAGES_RECEIVER).access(ROLE_USER_OR_ADMIN)
-                .antMatchers(HttpMethod.GET, API_MESSAGES_RECEIVER_WITH_ID).access(ROLE_USER_OR_ADMIN)
-                .antMatchers(HttpMethod.DELETE, API_MESSAGES_SENDER_WITH_ID).access(ROLE_USER_OR_ADMIN)
-                .antMatchers(HttpMethod.DELETE, API_MESSAGES_RECEIVER_WITH_ID).access(ROLE_USER_OR_ADMIN)
+                .antMatchers(HttpMethod.GET, API_MESSAGES_RECEIVER_ID).access(ROLE_USER_OR_ADMIN)
+                .antMatchers(HttpMethod.DELETE, API_MESSAGES_SENDER_ID).access(ROLE_USER_OR_ADMIN)
+                .antMatchers(HttpMethod.DELETE, API_MESSAGES_RECEIVER_ID).access(ROLE_USER_OR_ADMIN)
+
+                // BOARDS
+                .antMatchers(HttpMethod.POST, API_BOARDS).authenticated()
+                .antMatchers(HttpMethod.GET, API_BOARDS_ALL).access(ROLE_USER_OR_ADMIN)
+                .antMatchers(HttpMethod.GET, API_BOARDS_BEST).access(ROLE_USER_OR_ADMIN)
+                .antMatchers(HttpMethod.GET, API_BOARDS_ID).access(ROLE_USER_OR_ADMIN)
+                .antMatchers(HttpMethod.POST, API_BOARDS_ID).access(ROLE_USER_OR_ADMIN)
+                .antMatchers(HttpMethod.POST, API_BOARDS_ID_FAVORITE).access(ROLE_USER_OR_ADMIN)
+                .antMatchers(HttpMethod.PUT, API_BOARDS_ID).access(ROLE_USER_OR_ADMIN)
+                .antMatchers(HttpMethod.DELETE, API_BOARDS_ID).access(ROLE_USER_OR_ADMIN)
 
                 // 나머지 요청은 ROLE_ADMIN만 접근 가능
                 .anyRequest().hasAnyRole("ROLE_ADMIN")

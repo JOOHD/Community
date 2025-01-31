@@ -10,7 +10,8 @@ spring:
 
 upload:
   image:
-    location: /User/user/image/
+    location: C:/Users/user/image/ # window 경로
+              # /Users/user/image/ mac or linux 경로
 
 jwt:
-  secret: ""
+  secret: "IqUESdB4c3m7iFDLQOeibqaNpjp107hFAEdTIxZVzrLZKdREEbQrKknqs5Y4bDqlbbOK18b5z/mgllCelOhUKw=="
