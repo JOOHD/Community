@@ -62,11 +62,12 @@ public class SecurityConfig {
         http.csrf().disable();
 
         // CORS
-        http.
-                cors().configurationSource(request -> {
+        http
+                .cors().configurationSource(request -> {
                     var cors = new CorsConfiguration();
                     cors.setAllowedOrigins(List.of("https://633ec6989ec820004a30086c--cheery-kheer-fe145b.netlify.app/"));
                     cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+                    cors.setAllowedHeaders(List.of("Authorization", "Content-Type"));
                     cors.setAllowedHeaders(List.of("*"));
                     return cors;
                 });
@@ -88,6 +89,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
 
+                .antMatchers("/api/**").authenticated() // 인증된 사용자만 접근 가능
                 .antMatchers("/auth/**").permitAll()
                 .antMatchers("/swagger-ui/**", "/v3/**", "/test").permitAll() // swagger
 
@@ -108,7 +110,7 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.DELETE, API_MESSAGES_RECEIVER_ID).access(ROLE_USER_OR_ADMIN)
 
                 // BOARDS
-                .antMatchers(HttpMethod.POST, API_BOARDS).authenticated()
+                .antMatchers(HttpMethod.POST, API_BOARDS).access(ROLE_USER_OR_ADMIN)
                 .antMatchers(HttpMethod.GET, API_BOARDS_ALL).access(ROLE_USER_OR_ADMIN)
                 .antMatchers(HttpMethod.GET, API_BOARDS_BEST).access(ROLE_USER_OR_ADMIN)
                 .antMatchers(HttpMethod.GET, API_BOARDS_ID).access(ROLE_USER_OR_ADMIN)
@@ -117,8 +119,8 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.PUT, API_BOARDS_ID).access(ROLE_USER_OR_ADMIN)
                 .antMatchers(HttpMethod.DELETE, API_BOARDS_ID).access(ROLE_USER_OR_ADMIN)
 
-                // 나머지 요청은 ROLE_ADMIN만 접근 가능
-                .anyRequest().hasAnyRole("ROLE_ADMIN")
+                // .anyRequest().hasAnyRole("ROLE_ADMIN")
+                .anyRequest().permitAll()
 
                 // JWT 필터 추가
                 .and()

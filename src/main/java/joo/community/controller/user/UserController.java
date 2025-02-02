@@ -5,10 +5,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import joo.community.dto.user.UserDto;
+import joo.community.entity.user.RefreshToken;
 import joo.community.response.Response;
 import joo.community.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @Api(value = "User Controller", tags = "User")
@@ -25,6 +28,17 @@ public class UserController {
      */
 
     private final UserService userService;
+
+    @ApiOperation(value = "사용자 인증 정보 확인", notes = "현재 로그인한 사용자의 인증 정보 확인")
+    @GetMapping("/me")
+    public ResponseEntity<?> getAuthenticatedUser(Authentication authentication) {
+        if (authentication == null || authentication.getPrincipal() == "anonymousUser") {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인되지 않은 사용자입니다.");
+        }
+
+        // 현재 로그인한 사용자 정보 반환
+        return ResponseEntity.ok(authentication);
+    }
 
     @ApiOperation(value = "전체 회원 조회", notes = "전체 회원을 조회")
     @ResponseStatus(HttpStatus.OK)
