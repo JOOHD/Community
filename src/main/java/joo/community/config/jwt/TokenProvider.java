@@ -15,6 +15,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,28 +30,27 @@ import java.util.stream.Collectors;
 @PropertySource("classpath:secure.properties")
 public class TokenProvider {
 
-    // generateTokenDto : Access/Refresh token 생성.
-    // validateToken : JWT 유효성 검증.
-    // getAuthentication : 토큰에서 사용자 정보 추출.
-    // getExpiration(String token): 토큰 만료 시간 추출.
-
     private static final String AUTHORITIES_KEY = "auth";
     private static final String BEARER_TYPE = "bearer";
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24; // 1시간 * 24 = 24시간(-Dev)
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 7;  // 7일
     private final Key key;
 
+    @Value("${jwt.secret}")
+    private String secretKey;
+
     public TokenProvider(@Value("${jwt.secret}") String secretKey) {
-        log.info("secretKey : " + secretKey);
+        log.info("------------------------------------------secretKey : " + secretKey);
+        // Base64로 인코딩된 비밀키를 디코딩하여 SecretKey 객체를 생성
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         if (keyBytes.length < 64) {
             throw new IllegalArgumentException("jwt.secret 키 길이가 너무 짧습니다. 최소 512비트(64바이트) 이상이어야 합니다.");
         }
         this.key = Keys.hmacShaKeyFor(keyBytes);
+        log.info("------------------------------------------키가 정상적으로 생성되었습니다. key: {}", key);
     }
 
     public TokenDto generateTokenDto(Authentication authentication) {
-
         // 권한을 가져오기
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -59,7 +60,6 @@ public class TokenProvider {
 
         // Access Token 생성 (1시간)
         Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
-
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())       // payload "sub": "name"
                 .claim(AUTHORITIES_KEY, authorities)        // payload "auth": "ROLE_USER"
@@ -82,7 +82,6 @@ public class TokenProvider {
     }
 
     public Authentication getAuthentication(String accessToken) {
-
         // 토큰 복호화
         Claims claims = parseClaims(accessToken);
 
@@ -104,16 +103,36 @@ public class TokenProvider {
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            // Step1 : 서명 검증을 위해 key 사용
+            log.info("validating token : " + token);
+            Jwts.parserBuilder()
+                    .setSigningKey(key) // 생성된 key 사용
+                    .build()
+                    .parseClaimsJws(token); // 토큰 서명 검증
+
+            // Step2 : 토큰 만료 검사
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            Date expiration = claims.getExpiration();
+            if (expiration.before(new Date())) {
+                log.warn("토큰이 만료되었습니다. 만료 시간 : " + expiration);
+                return false;
+            }
+
+            log.info("JWT 서명 검증 성공");
             return true;
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
-            log.info("잘못된 JWT 서명입니다.");
+            log.error("잘못된 JWT 서명입니다. 서명 검증에 실패했습니다.", e);
         } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT 토큰입니다.");
+            log.error("만료된 JWT 토큰입니다. 만료 시간: {}", e.getClaims().getExpiration(), e);
         } catch (UnsupportedJwtException e) {
-            log.info("지원되지 않는 JWT 토큰입니다.");
+            log.error("지원되지 않는 JWT 토큰입니다.", e);
         } catch (IllegalArgumentException e) {
-            log.info("JWT 토큰이 잘못되었습니다.");
+            log.error("JWT 토큰이 잘못되었습니다. 토큰: {}", token, e);
         }
         return false;
     }
@@ -121,10 +140,10 @@ public class TokenProvider {
     private Claims parseClaims(String accessToken) {
         try {
             return Jwts.parserBuilder()
-                       .setSigningKey(key)
-                       .build()
-                       .parseClaimsJws(accessToken)
-                       .getBody();
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(accessToken)
+                    .getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
