@@ -48,12 +48,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
     // Request Header 에서 토큰 정보를 꺼내오기
     private String resolveToken(HttpServletRequest request) {
+
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        log.info("------------------------------------------bearerToken : " + bearerToken);
+
         // bearerToken 이 null 이 아니면서 공백이 아닌 경우 & "Bearer " 로 시작하는 경우에만 실행됨
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7).trim(); // "Bearer " 이후의 실제 JWT 토큰 값만 반환
         }
+
         return null;
     }
 }

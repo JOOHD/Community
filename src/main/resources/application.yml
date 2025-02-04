@@ -7,10 +7,9 @@ server:
 #    org.springframework.web: TRACE
 #    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
 
-
 spring:
   profiles:
-    active: local
+    active: local # application-local.yml 을 연결해주는 코드
 
   jpa:
     hibernate:
